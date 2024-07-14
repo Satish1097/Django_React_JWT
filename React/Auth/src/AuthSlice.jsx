@@ -1,6 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+const hydrateAuthState = () => {
+  const token = localStorage.getItem('token');
+  const refreshToken = localStorage.getItem('refreshToken');
+  return {
+    token,
+    refreshToken,
+    isAuthenticated: !!token,
+    loading: false,
+    error: null,
+  };
+};
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -53,4 +65,23 @@ export const login = (username, password) => async dispatch => {
   } catch (error) {
     dispatch(loginFailure(error.message));
   }
+};
+export const performLogout = () => async (dispatch, getState) => {
+  const { token } = getState().auth;
+
+  try {
+    if (token) {
+      // Optionally call an API to invalidate the token on the server
+      await axios.post('http://127.0.0.1:8000/api/token/refresh/', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Failed to logout", error.message);
+    // Handle the error if needed
+  }
+
+  dispatch(logout());
 };

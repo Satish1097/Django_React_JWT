@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from './AuthSlice';
+import { login, performLogout } from './AuthSlice';  // Correct the import here
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -12,6 +12,10 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(login(username, password));
+  }
+
+  const handleLogout = async (e) => {
+    dispatch(performLogout());
   }
 
   return (
@@ -29,7 +33,10 @@ const LoginForm = () => {
       </form>
       {authState.loading && <p>Loading...</p>}
       {authState.error && <p>Error: {authState.error}</p>}
-      {authState.isAuthenticated && <p>Welcome!{username}</p>}
+      {authState.isAuthenticated && <>
+        <p>Welcome, {username}!</p>
+        <button onClick={handleLogout}>Logout</button>  {/* Correct the onClick handler */}
+      </>}
     </div>
   );
 };
